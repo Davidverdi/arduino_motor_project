@@ -27,3 +27,5 @@ void setup() {
   // turn on motor
   myMotor->run(RELEASE);
 }
+
+void loop() {}
