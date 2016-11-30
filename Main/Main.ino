@@ -46,42 +46,43 @@ int photovolt = A1;   //This is the output from the photoresistor
 
 // Declare other parameters
 int steps_per_rev = 200;
-int stepper_port = 2;      //Port 2, which is M3 and M4
-int dc_port = 2;           //DC motor is connected to M2
-
+int stepper_port = 2;      // Port 2, which is M3 and M4
+int dc_port = 2;           // DC motor is connected to M2
+int dc_speed = 250;        // 0-255
+int stepper_speed = 10;    // 10 rpm
 
 
 // Initialize motors 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield ()
 //Connect a stepper motor with 200 steps per revolution (1.8 degree) to motor port #2 (M3 and M4)
-Adafruit_StepperMotor *stepper = AFMS.getStepper(200,2);
+Adafruit_StepperMotor *stepper = AFMS.getStepper(steps_per_rev, stepper_port);
 //Connect the DC motor to port M2
-Adafruit_DCMotor *DCMotor = AFMS.getMotor(2)
-
+Adafruit_DCMotor *DCMotor = AFMS.getMotor(dc_port)
 
 
 void setup() {
   // put your setup code here, to run once:
- /* Set stepper, potientiometer and DC motor(?)
-  *  to zero position
-  * Start stepper motor.
-  * Read signal from photo-resistor.
-  */
   Serial.begin(9600);        //set up Serial library at 9600 bps
-  Serial.println("Light Aiming Beam (L.A.B.)");
+  Serial.println("Light Aiming Beam (L.A.B.)\n");
 
   AFMS.begin();        // create with the default frequency 1.6kHz
 
-  //This sets the motor and stepper speeds.
-  DCMotor->setSpeed(150)
-  stepper->setSpeed(20)        // 10 rpm
 
-  //Set stepper to start position (how?)
-  //Set potentiometer to start position (how?)
+  // Set Motor Speeds
+  DCMotor->setSpeed(dc_speed);
+  Serial.println("DC Motor speed set to:");
+  Serial.println(dc_speed);
+  Serial.println("\n");
+  
+  stepper->setSpeed(stepper_speed);
+  Serial.println("Stepper Motor speed set to:");
+  Serial.println(stepper_speed);
+  Serial.println("\n");
 
-  //Set "Start" to 1
-}
+  
+
+  
 
 void loop() {
   // put your main code here, to run repeatedly:
