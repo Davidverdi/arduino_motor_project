@@ -1,5 +1,5 @@
 /* ARDUINO PROJECT
- 
+
  Aim: Detect the direction of brightest light
  and turn a solar cell to face that direction.
 
@@ -33,19 +33,32 @@
  */
 
 
+// Include Libraries 
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
+
+// Declare Analog Read pin Settings
+int pot = A0;         //This is the potentiometer, which is connected to the DC motor/Solar Panel
+int photovolt = A1;   //This is the output from the photoresistor
+
+
+// Declare other parameters
+int steps_per_rev = 200;
+int stepper_port = 2;      //Port 2, which is M3 and M4
+int dc_port = 2;           //DC motor is connected to M2
+
+
+
+// Initialize motors 
 // Create the motor shield object with the default I2C address
-Adafruit_MotorShield AFMS = Adafruit_MotorShield ();
-
-//Connect a stepper motor with 200 steps per revolution (1.8 degree)
-// to motor port #2 (M3 and M4)
+Adafruit_MotorShield AFMS = Adafruit_MotorShield ()
+//Connect a stepper motor with 200 steps per revolution (1.8 degree) to motor port #2 (M3 and M4)
 Adafruit_StepperMotor *stepper = AFMS.getStepper(200,2);
-
 //Connect the DC motor to port M2
 Adafruit_DCMotor *DCMotor = AFMS.getMotor(2)
+
 
 
 void setup() {
