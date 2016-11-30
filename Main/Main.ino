@@ -3,12 +3,35 @@
  Aim: Detect the direction of brightest light
  and turn a solar cell to face that direction.
 
- Date: 28th November 2016
+ Date Created: 28th November 2016
+ Date Updated: 30th November 2016
  Contributors:
    Kevin Baquero
    David Verdi
    Adelaide Young
  */
+
+/* Notes
+ *  The Solar panel is connected to the DC motor. 
+ *  The DC motor is connected to the 10k, Multi-Turn potentiometer, via three gears.
+ *  
+ *  The Photoresistor is connected to the stepper motor.
+ *  
+ *  All acutation is calibrated. First, the stepper must be manually homed. 
+ *  
+ *  Operation:
+ *  1. Stepper motor is homed to a marked zero position
+ *  2. Arduino is powered on
+ *  3. Solar panel is rotated to zero position (while loop to target voltage)
+ *  3. Stepper motor rotates a full 360 degrees using however many steps. 
+ *     For each step, the analog voltage is recorded.
+ *     The voltage out will be maximum at the brightest spot. 
+ *     The step that produced the maximum voltage will be saved
+ *  4. A formula will convert the target step value to degrees
+ *  5. A formula will convert the degrees to a target voltage for the potentiometer
+ *  6. The the DC motor will actuate forward untill it hits the target voltage
+ */
+
 
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
