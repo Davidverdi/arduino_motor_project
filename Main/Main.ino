@@ -1,17 +1,16 @@
 /* ARDUINO PROJECT
-
- Aim: Detect the direction of brightest light
- and turn a solar cell to face that direction.
-
- Date Created: 28th November 2016
- Date Updated: 30th November 2016
- Contributors:
-   Kevin Baquero
-   David Verdi
-   Adelaide Young
- */
-
-/* Notes
+ * Aim: Detect the direction of brightest light 
+ * and turn a solar cell to face that direction. 
+ * 
+ * Date Created: 28 November 2016
+ * Date Updated: 1 December 2016
+ * 
+ * Contributors
+ *   Keven Baquero
+ *   David Verdi
+ *   Adeliaide Young
+ *   
+ * Notes
  *  The Solar panel is connected to the DC motor. 
  *  The DC motor is connected to the 10k, Multi-Turn potentiometer, via three gears.
  *  
@@ -20,8 +19,8 @@
  *  All acutation is calibrated. First, the stepper must be manually homed. 
  *  
  *  Operation:
- *  1. Stepper motor is homed to a marked zero position
- *  2. Arduino is powered on
+ *  1. Stepper motor is homed to a marked zero position - DONE
+ *  2. Arduino is powered on - DONE
  *  3. Solar panel is rotated to zero position (while loop to target voltage)
  *  3. Stepper motor rotates a full 360 degrees using however many steps. 
  *     For each step, the analog voltage is recorded.
@@ -33,26 +32,35 @@
  */
 
 
-// Include Libraries 
+/*** Include Libraries ***/
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
 
-// Declare Analog Read pin Settings
-int pot = A0;         //This is the potentiometer, which is connected to the DC motor/Solar Panel
-int photovolt = A1;   //This is the output from the photoresistor
+/*** Declare Analog Read pin Settings ***/
+int pot_pin = A0;         //This is the potentiometer, which is connected to the DC motor/Solar Panel
+int photoresist_pin = A1;   //This is the output from the photoresistor
 
 
-// Declare other parameters
-int steps_per_rev = 200;
+/*** Declare Motor parameters ***/
+int steps_per_rev = 200;   // Determine Experimentally
 int stepper_port = 2;      // Port 2, which is M3 and M4
 int dc_port = 2;           // DC motor is connected to M2
 int dc_speed = 250;        // 0-255
 int stepper_speed = 10;    // 10 rpm
 
 
-// Initialize motors 
+/*** Declare Measured Voltage Parameters ***/
+int dc_zero_min = 10;   // Experimentally Determined
+int dc_zero_max = 15;
+int dc_360_voltage = 500;   // Experimentally Determined
+
+/*** Helper Function Parameters ***/
+int readnumber = 5;
+
+
+/*** Initialize motors ***/ 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield ()
 //Connect a stepper motor with 200 steps per revolution (1.8 degree) to motor port #2 (M3 and M4)
@@ -62,7 +70,6 @@ Adafruit_DCMotor *DCMotor = AFMS.getMotor(dc_port)
 
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);        //set up Serial library at 9600 bps
   Serial.println("Light Aiming Beam (L.A.B.)\n");
 
@@ -80,6 +87,14 @@ void setup() {
   Serial.println(stepper_speed);
   Serial.println("\n");
 
+
+  // Delay and Prompt user to zero Stepper Motor. 
+  Serial.println("Please ensure that the stepper motor is in its zero position... \n");
+  delay(5000) // 5 Second delay
+
+  // Home DC Motor/Solar Panel
+  position = read_sensor(int pot_pin);
+  
   
 
   
@@ -123,4 +138,17 @@ void loop() {
    //The Photocell should now be facing the maximum light.
 
    //Set "Start" to 0
+}
+
+/*** Helper Functions ***/
+int read_sensor(int pin) {
+  // Reads from the sensor five times and output average reading
+  int reads;
+  int sum = 0;
+
+  for (reads = 0; reads < readnumber; reads++) {
+    sum = sum + analog_read(pin);
+  }
+  int average = (sum / reads);
+  return average;
 }
