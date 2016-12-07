@@ -95,55 +95,55 @@ void setup() {
 
 
   // Delay and Prompt user to zero Stepper Motor. 
-  Serial.println("Please ensure that the stepper motor is in its zero position... \n");
-  delay(5000) // 5 Second delay
+  Serial.println("Please ensure that the stepper motor (and Photoresistor) is in its zero position... \n");
+  delay(7000) // 7 Second delay
+  int stepper_location = 0;
 
   // Home DC Motor/Solar Panel
-  position = read_sensor(int pot_pin);
+  int DC_position = read_sensor(int pot_pin);
   
+  //Correct DC if too far backwards
+  while(DC_position < dc_zero_min) {
+    DCMotor->run(FORWARD);
+    DC_position = read_sensor(int pot_pin);
+  }
+  DCMotor->run(RELEASE);
   
+  // Correct DC if too far forward
+  while(DC_position > dc_zero_max) {
+    DCMotor->run(BACKWARD);
+    DC_position = read_sensor(int pot_pin);
+  }
+  DCMotor->run(RELEASE);
+  
+  int DC_initial_position = DC_position  // This is the initial DC motor position after homing sequence. 
 
+  // Find brightest spot by going step by step on photoresistor for one revolution.
+  int max_brightness = read_sensor(photoresist_pin);
+  int brightness_reading = max_brightness;
+  int max_position = 0;
+  while( stepper_location < steps_per_rev){
+    stepper->step(1);
+    stepper_location++;
+    brightness_reading = read_sensor(photoresist_pin);
+    if (brightness_reading > max_brightness) {
+      max_position = stepper_location;
+      max_brightness = brightness_reading;
+    }
+  }
+
+  int target_DC = steps2DC(max_position);
+
+  // Actuate DC motor to max voltage
+  while(DC_position < target_DC){
+    DCMotor->run(FORWARD);
+    DC_position = read_sensor(int pot_pin);
+  }
+
+Serial.println("Solar Panel is Properly Positioned!!! \n");
   
 
 void loop() {
-  // put your main code here, to run repeatedly:
- /* Start stepper motor.
-  * Record how many steps until photo-resistors detects
-  *  max.
-  * Stop stepper motor (unless we want to constantly
-  *  update it to the brightest light?)
-  * Turn DC motor until, variable resistor is at the 
-  *  same "degree" as stepper motor.
-  * (Photocell should be connected to DC motor.)
-  */
-
-  //If "Start" = 1, ...
-  
-  //Let d be the distance moved.
-  d = 0;
-  //Set initial light value to 0
-  
-  //if loop to keep stepper running until max reading
-  
-    //This turns the stepper motor one step
-    stepper->step(100, FORWARD, SINGLE);
-            //Can also do backwards, interleave, microstep etc.
-    //Record: d = d+1
-    //Read the light value
-    //Compare light value to previous readings.
-    //If greater, record d.
-    //If lesser, move forward one step?
-    //Repeat until largest value is found.
-
-   //When largest value is found,
-   //TURN OFF STEPPER
-   //Turn on motor
-
-   //When potientiometer value = d
-   //Turn off motor
-   //The Photocell should now be facing the maximum light.
-
-   //Set "Start" to 0
 }
 
 /*** Helper Functions ***/
@@ -157,4 +157,8 @@ int read_sensor(int pin) {
   }
   int average = (sum / reads);
   return average;
+}
+
+int steps2DC(int step_no) {
+  return (((step_no*(dc_360_voltage - DC_initial_position)) / steps_per_rev) + DC_initial_position);
 }
