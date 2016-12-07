@@ -3,7 +3,7 @@
  * and turn a solar cell to face that direction. 
  * 
  * Date Created: 28 November 2016
- * Date Updated: 1 December 2016
+ * Date Updated: 7 December 2016
  * 
  * Contributors
  *   Keven Baquero
@@ -29,7 +29,13 @@
  *  4. A formula will convert the target step value to degrees
  *  5. A formula will convert the degrees to a target voltage for the potentiometer
  *  6. The the DC motor will actuate forward untill it hits the target voltage
+ *  
+ *  Experimental TODO:
+ *  - Experimentally determine the number of steps per revolution
+ *  - Experimentally determine the potentiometer zero voltage range
+ *  - Experimentally determine the potentiometer 360 voltage range
  */
+
 
 
 /*** Include Libraries ***/
