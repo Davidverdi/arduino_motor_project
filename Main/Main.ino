@@ -158,3 +158,17 @@ int read_sensor(int pin) {
   int average = (sum / reads);
   return average;
 }
+  
+void count_steps() {
+  //Allows us to experimentally find the number of steps per revolution
+  int total = 0;
+  int i = 0;
+  while(i < 300)  //300 should be enough steps to make one revolution
+  {
+    stepper->step(1);
+    total++;
+    Serial.print("steps:");
+    Serial.println(total);
+    delay(100);
+  }
+}
